@@ -13,7 +13,6 @@ public:
 private:
     std::ifstream _inputHandle;
     std::string _inputFileName;
-    std::string _contents;
 };
 
 #endif

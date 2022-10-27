@@ -1,4 +1,5 @@
 #include <compiler.hh>
+#include <lexing/lexer.hh>
 #include <diagnostics.hh>
 #include <sstream>
 #include <iostream>
@@ -11,14 +12,16 @@ Compiler::Compiler(const std::string& inputFileName)
     if(!_inputHandle.is_open())
         Diagnostics::FatalError("vpras", inputFileName + ": No such file or directory");
     Diagnostics::setFileName(inputFileName);
-    
-    std::stringstream buf;
-    buf << _inputHandle.rdbuf();
-    _contents = buf.str() + '\n';
-
-    _inputHandle.close();
 }
 
 void Compiler::Compile()
 {
+    Lexing::Lexer lex(_inputHandle);
+
+    Lexing::Token tok = lex.NextToken();
+    while(tok.GetType() != Lexing::TokenType::Eof)
+    {
+        std::cout << tok << std::endl;
+        tok = lex.NextToken();
+    }
 }
