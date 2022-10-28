@@ -35,7 +35,7 @@ namespace Lexing
             { "global",  TokenType::Global },
             { "movq",    TokenType::Movq },
             { "ret",     TokenType::Ret },
-            { "rax", TokenType::Register }, // TODO: Add actual register support
+            { "rax",     TokenType::Register }, // TODO: Add actual register support
         };
 
         if(std::isalpha(Current()) || Current() == '_' || Current() == '.')

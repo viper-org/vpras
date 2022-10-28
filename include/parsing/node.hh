@@ -15,7 +15,7 @@ namespace Parsing
     class Node
     {
     public:
-        virtual ~Node();
+        virtual ~Node() {  }
 
         virtual void Print(std::ostream& stream) const = 0;
     };

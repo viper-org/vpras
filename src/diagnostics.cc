@@ -24,19 +24,10 @@ namespace Diagnostics
         std::exit(1);
     }
 
-    void CompilerError(const unsigned int lineNumber, const unsigned int colNumber, 
-    std::string_view message,
-    const char* errorBegin, const char* errorEnd,
-    const char* lineBegin, const char* lineEnd)
+    void CompilerError(const unsigned int lineNumber, std::string_view message)
     {
-        std::string start  = std::string(lineBegin + 1, errorBegin);
-        std::string error  = std::string(errorBegin, errorEnd);
-        std::string end    = std::string(errorEnd, lineEnd);
-        std::string spaces = std::string(start.length(), ' ');
-
-        std::cerr << bold << fileName << ":" << lineNumber << ":" << colNumber << ": " << red << "error: " << defaults << message << "\n";
-        std::cerr << "    " << lineNumber << " | " << start << bold << red << error << defaults << end << "\n";
-        std::cerr << "      | " << spaces << bold << red << "^" << std::string(error.length() - 1, '~') << defaults << "\n";
+        std::cerr << bold << fileName << ":" << lineNumber << ": " << defaults << message;
+        
         std::exit(1);
     }
 

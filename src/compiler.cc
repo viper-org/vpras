@@ -1,5 +1,6 @@
 #include <compiler.hh>
 #include <lexing/lexer.hh>
+#include <parsing/parser.hh>
 #include <diagnostics.hh>
 #include <sstream>
 #include <iostream>
@@ -16,12 +17,14 @@ Compiler::Compiler(const std::string& inputFileName)
 
 void Compiler::Compile()
 {
-    Lexing::Lexer lex(_inputHandle);
+    Lexing::Lexer* lexer = new Lexing::Lexer(_inputHandle);
 
-    Lexing::Token tok = lex.NextToken();
-    while(tok.GetType() != Lexing::TokenType::Eof)
+    Parsing::Parser parser(lexer);
+
+    for(Parsing::Node* node : parser.Parse())
     {
-        std::cout << tok << std::endl;
-        tok = lex.NextToken();
+        node->Print(std::cout);
+        std::cout << '\n';
+        delete node;
     }
 }

@@ -7,10 +7,7 @@ namespace Diagnostics
     [[noreturn]] void FatalError(std::string_view sender, std::string_view message);
     [[noreturn]] void Error(std::string_view sender, std::string_view message);
     
-    [[noreturn]] void CompilerError(const unsigned int lineNumber, const unsigned int colNumber, 
-        std::string_view message,
-        const char* errorBegin, const char* errorEnd,
-        const char* lineBegin, const char* lineEnd);
+    [[noreturn]] void CompilerError(const unsigned int lineNumber, std::string_view message);
 
     void setFileName(std::string_view newFileName);
 }
