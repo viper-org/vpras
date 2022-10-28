@@ -7,7 +7,6 @@ namespace Lexing
 {
     enum class TokenType
     {
-        Dot,
         Colon,
         Comma,
 

@@ -11,8 +11,6 @@ namespace Lexing
     {
         switch(_type)
         {
-            case TokenType::Dot:
-                return "Dot";
             case TokenType::Colon:
                 return "Colon";
             case TokenType::Comma:
@@ -31,7 +29,8 @@ namespace Lexing
                 return "Movq";
             case TokenType::Ret:
                 return "Ret";
-            break;
+            case TokenType::Eof:
+                return "Eof";
         }
         return ""; // To make the compiler happy
     }

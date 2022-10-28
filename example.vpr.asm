@@ -1,5 +1,4 @@
 	section .text
-	global Main
-Main:
-	mov QWORD rax, 0
+global Main:
+	movq %rax, 0
 	ret

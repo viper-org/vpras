@@ -8,7 +8,7 @@
 namespace Lexing
 {
     Lexer::Lexer(std::ifstream& file)
-        :_file(file), _current(_file.get())
+        :_file(file), _lineNumber(1), _current(_file.get())
     {
     }
 
@@ -38,11 +38,11 @@ namespace Lexing
             { "rax", TokenType::Register }, // TODO: Add actual register support
         };
 
-        if(std::isalpha(Current()) || Current() == '_')
+        if(std::isalpha(Current()) || Current() == '_' || Current() == '.')
         {
             std::string value = std::string(1, Current());
             
-            while(std::isalnum(Peek()) || Peek() == '_')
+            while(std::isalnum(Peek()) || Peek() == '_' || Peek() == '.')
             {
                 Consume();
                 value += Current();
@@ -77,9 +77,7 @@ namespace Lexing
             case '\t':
                 Consume();
                 return NextToken();
-
-            case '.':
-                TOKEN(Dot);
+            
             case ':':
                 TOKEN(Colon);
             case ',':
@@ -87,7 +85,7 @@ namespace Lexing
 
 
             case std::ifstream::traits_type::eof():
-                TOKEN(Eof);
+                return Token(TokenType::Eof, "EOF", _lineNumber);
 
             
             default:
