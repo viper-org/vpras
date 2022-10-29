@@ -10,6 +10,8 @@ namespace Parsing
         Label(std::string name);
 
         void Print(std::ostream& stream) const override;
+
+        void Emit(Codegen::ELF* elf) override;
     private:
         std::string _name;
     };

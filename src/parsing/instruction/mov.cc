@@ -3,7 +3,7 @@
 namespace Parsing
 {
     MovInst::MovInst(Node* lhs, Node* rhs, Size size)
-        :_lhs(std::move(lhs)), _rhs(std::move(rhs)), _size(size)
+        :Node(NodeType::Instruction), _lhs(std::move(lhs)), _rhs(std::move(rhs)), _size(size)
     {
     }
 
@@ -19,5 +19,9 @@ namespace Parsing
         _lhs->Print(stream);
         stream << "\n\t";
         _rhs->Print(stream);
+    }
+
+    void MovInst::Emit(Codegen::ELF* elf)
+    {
     }
 }

@@ -3,12 +3,16 @@
 namespace Parsing
 {
     Label::Label(std::string name)
-        :_name(std::move(name))
+        :Node(NodeType::Label), _name(std::move(name))
     {
     }
 
     void Label::Print(std::ostream& stream) const
     {
         stream << "<Label>: " << _name;
+    }
+
+    void Label::Emit(Codegen::ELF* elf)
+    {
     }
 }

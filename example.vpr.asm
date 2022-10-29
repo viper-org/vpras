@@ -1,2 +1,1 @@
-global Main:
-	ret
+ret

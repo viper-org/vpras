@@ -10,6 +10,8 @@ namespace Parsing
         Register(std::string id, Size size);
 
         void Print(std::ostream& stream) const override;
+
+        void Emit(Codegen::ELF* elf) override;
     private:
         std::string _id;
         Size _size;
