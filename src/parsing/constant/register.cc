@@ -12,7 +12,7 @@ namespace Parsing
         stream << "<Register>: " << _id;
     }
 
-    void Register::Emit(Codegen::ELF* elf)
+    void Register::Emit(Codegen::SectionHeader* text)
     {
     }
 }

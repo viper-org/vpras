@@ -1,77 +1,115 @@
 #include <codegen/elf.hh>
+#include <fstream>
+#include <iostream>
 
 namespace Codegen
 {
-    SectionHeader::SectionHeader(std::string name, ShType sh_type, unsigned long long sh_flags, unsigned long long sh_offset, unsigned int sh_name)
-        :_name(std::move(name)), _sh_type(sh_type), _sh_flags(sh_flags), _sh_offset(sh_offset), _sh_name(sh_name), _sh_size(0)
+    SectionHeader::SectionHeader(std::string name, ShType sh_type, unsigned long long sh_flags, unsigned int sh_name)
+        :_name(std::move(name)), _sh_type(sh_type), _sh_flags(sh_flags), _sh_name(sh_name), _sh_size(0)
     {
     }
 
-    void SectionHeader::WriteByte(unsigned char data)
+    void SectionHeader::WriteByte(unsigned char data, std::stringstream* stream)
     {
-        _data.write(reinterpret_cast<const char*>(&data), 1);
-        ++_sh_size;
+        std::stringstream& ss = (stream == nullptr)?(_data):(*stream);
+        ss.write(reinterpret_cast<const char*>(&data), 1);
+        if(!stream)
+            _sh_size += 1;
     }
-    void SectionHeader::WriteWord(unsigned short data)
+    void SectionHeader::WriteWord(unsigned short data, std::stringstream* stream)
     {
-        _data.write(reinterpret_cast<const char*>(&data), 2);
-        _sh_size += 2;
+        std::stringstream& ss = (stream == nullptr)?(_data):(*stream);
+        ss.write(reinterpret_cast<const char*>(&data), 2);
+        if(!stream)
+            _sh_size += 2;
     }
-    void SectionHeader::WriteLong(unsigned long data)
+    void SectionHeader::WriteLong(unsigned long data, std::stringstream* stream)
     {
-        _data.write(reinterpret_cast<const char*>(&data), 4);
-        _sh_size += 4;
+        std::stringstream& ss = (stream == nullptr)?(_data):(*stream);
+        ss.write(reinterpret_cast<const char*>(&data), 4);
+        if(!stream)
+            _sh_size += 4;
     }
-    void SectionHeader::WriteQuad(unsigned long long data)
+    void SectionHeader::WriteQuad(unsigned long long data, std::stringstream* stream)
     {
-        _data.write(reinterpret_cast<const char*>(&data), 8);
-        _sh_size += 8;
+        std::stringstream& ss = (stream == nullptr)?(_data):(*stream);
+        ss.write(reinterpret_cast<const char*>(&data), 8);
+        if(!stream)
+            _sh_size += 8;
     }
 
     unsigned long long SectionHeader::GetSize() const
     {
         return _sh_size;
     }
+    std::string_view SectionHeader::GetName() const
+    {
+        return _name;
+    }
+
+    void SectionHeader::SetOffset(unsigned long long sh_offset)
+    {
+        _sh_offset = sh_offset;
+    }
 
     void SectionHeader::Print(std::ostream& stream)
     {
-        WriteLong(_sh_name);
-        WriteLong(static_cast<unsigned long>(_sh_type));
-        WriteQuad(_sh_flags);
-        WriteQuad(0x00); // sh_addr
-        WriteQuad(_sh_offset);
-        WriteQuad(_sh_size);
+        size_t size = _data.str().size();
+        if(size)
+        {
+            stream << _data.rdbuf();
+            size = ((size + 15) & ~15) - size; // Calculate bytes needed for padding
+            std::cout << size << std::endl;
+            while(size--)
+            {
+                int zero = 0x00;
+                stream.write(reinterpret_cast<const char*>(&zero), 1);
+            }
+        }
+    }
+
+    void SectionHeader::PrintHdr(std::ostream& stream)
+    {
+        WriteLong(_sh_name, &_hdr);
+        WriteLong(static_cast<unsigned long>(_sh_type), &_hdr);
+        WriteQuad(_sh_flags, &_hdr);
+        WriteQuad(0x00, &_hdr); // sh_addr
+        if(_sh_type == ShType::SHT_NULL)
+            WriteQuad(0x00, &_hdr);
+        else
+            WriteQuad(_sh_offset, &_hdr);
+        WriteQuad(_sh_size, &_hdr);
         if(_sh_type == ShType::SHT_SYMTAB)
         {
-            WriteLong(0x04); // sh_link
-            WriteLong(0x03); // sh_info
+            WriteLong(0x04, &_hdr); // sh_link
+            WriteLong(0x03, &_hdr); // sh_info
         }
         else
         {
-            WriteLong(0x00); // sh_link
-            WriteLong(0x00); // sh_info
+            WriteLong(0x00, &_hdr); // sh_link
+            WriteLong(0x00, &_hdr); // sh_info
         }
         switch(_sh_type) // sh_addralign
         {
             case ShType::SHT_NULL:
-                WriteQuad(0x00);
+                WriteQuad(0x00, &_hdr);
                 break;
             case ShType::SHT_PROGBITS:
-                WriteQuad(0x10);
+                WriteQuad(0x10, &_hdr);
                 break;
             case ShType::SHT_SYMTAB:
-                WriteQuad(0x08);
+                WriteQuad(0x08, &_hdr);
                 break;
             case ShType::SHT_STRTAB:
-                WriteQuad(1);
+                WriteQuad(0x01, &_hdr);
                 break;
         }
         if(_sh_type == ShType::SHT_SYMTAB)
-            WriteQuad(0x12); // sh_entsize
+            WriteQuad(0x18, &_hdr); // sh_entsize
         else
-            WriteQuad(0x00); // sh_entsize
+            WriteQuad(0x00, &_hdr); // sh_entsize
         
-        stream << _data.rdbuf();
+        stream << _hdr.rdbuf();
     }
 
     ELF::ELF()
@@ -80,12 +118,11 @@ namespace Codegen
 
     SectionHeader* ELF::CreateSectionHeader(std::string name, ShType type, unsigned long long flags)
     {
-        unsigned long long _sh_offset = 0;
+        unsigned long long sh_name = 0;
         for(SectionHeader* shHdr : _sectionHeaders)
-        {
-            _sh_offset += shHdr->GetSize();
-        }
-        SectionHeader* shHdr = new SectionHeader(std::move(name), type, flags, _sh_offset, _sectionHeaders.size());
+            sh_name += shHdr->GetName().size() + 1;
+
+        SectionHeader* shHdr = new SectionHeader(std::move(name), type, flags, sh_name);
 
         _sectionHeaders.push_back(shHdr);
         
@@ -147,6 +184,15 @@ namespace Codegen
     void ELF::Print(std::ostream& stream)
     {
         stream << _out.rdbuf();
+        unsigned long long total_size = _sectionHeaders.size() * 0x40 + 0x40;
+        for(SectionHeader* shHdr : _sectionHeaders)
+        {
+            total_size = (total_size + 0x0F) & ~0x0F;
+            shHdr->SetOffset(total_size);
+            total_size += shHdr->GetSize();
+            shHdr->PrintHdr(stream);
+        }
+
         for(SectionHeader* shHdr : _sectionHeaders)
         {
             shHdr->Print(stream);

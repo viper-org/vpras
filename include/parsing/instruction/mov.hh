@@ -13,7 +13,7 @@ namespace Parsing
 
         void Print(std::ostream& stream) const override;
 
-        void Emit(Codegen::ELF* elf) override;
+        void Emit(Codegen::SectionHeader* text) override;
 
     private:
         Node* _lhs;

@@ -21,7 +21,7 @@ namespace Parsing
         _rhs->Print(stream);
     }
 
-    void MovInst::Emit(Codegen::ELF* elf)
+    void MovInst::Emit(Codegen::SectionHeader* text)
     {
     }
 }

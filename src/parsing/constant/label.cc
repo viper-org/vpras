@@ -12,7 +12,7 @@ namespace Parsing
         stream << "<Label>: " << _name;
     }
 
-    void Label::Emit(Codegen::ELF* elf)
+    void Label::Emit(Codegen::SectionHeader* text)
     {
     }
 }

@@ -32,7 +32,7 @@ namespace Parsing
 
         virtual void Print(std::ostream& stream) const = 0;
 
-        virtual void Emit(Codegen::ELF* elf) = 0;
+        virtual void Emit(Codegen::SectionHeader* text) = 0;
     private:
         NodeType _type;
     };

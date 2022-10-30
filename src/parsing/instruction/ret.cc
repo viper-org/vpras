@@ -12,8 +12,8 @@ namespace Parsing
         stream << "<Ret>";
     }
 
-    void RetInst::Emit(Codegen::ELF* elf)
+    void RetInst::Emit(Codegen::SectionHeader* text)
     {
-        elf->WriteByte(0xC3);
+        text->WriteByte(0xC3);
     }
 }
