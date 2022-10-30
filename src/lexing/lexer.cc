@@ -80,9 +80,13 @@ namespace Lexing
             case '%':
             {
                 Consume();
-                std::string value;
-                while(std::isalpha(Current()))
-                    value += Consume();
+                std::string value(1, Current());
+                while(std::isalpha(Peek()))
+                {
+                    Consume();
+                    value += Current();
+                }
+                Consume();
                 
                 return Token(TokenType::Register, value, _lineNumber);
             }

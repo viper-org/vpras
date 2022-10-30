@@ -11,6 +11,8 @@ namespace Parsing
 
         void Print(std::ostream& stream) const override;
 
+        int GetID() const;
+
         void Emit(Codegen::SectionHeader* text) override;
     private:
         std::string _id;

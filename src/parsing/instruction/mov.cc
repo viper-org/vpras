@@ -1,4 +1,5 @@
 #include <parsing/instruction/mov.hh>
+#include <parsing/constant/register.hh>
 
 namespace Parsing
 {
@@ -23,7 +24,10 @@ namespace Parsing
 
     void MovInst::Emit(Codegen::SectionHeader* text)
     {
-        text->WriteByte(0xB8);
-        _rhs->Emit(text);
+        if(Register* reg = dynamic_cast<Register*>(_lhs))
+        {
+            text->WriteByte(0xB8 + reg->GetID());
+            _rhs->Emit(text);
+        }
     }
 }
