@@ -36,20 +36,6 @@ void Compiler::Compile()
     Codegen::SectionHeader*& symtab = sections[3];
     Codegen::SectionHeader*& strtab = sections[4];
 
-    for(Parsing::Node* node : parser.Parse())
-    {
-        node->Emit(text);
-        delete node;
-    }
-    
-    // Initialize the section header string table
-    for(Codegen::SectionHeader* shHdr : sections)
-    {
-        for(char c : shHdr->GetName())
-            shstrtab->WriteByte(c);
-        shstrtab->WriteByte(0x00);
-    }
-
     // Null symtab entry
     symtab->WriteLong(0x00); // st_name
     symtab->WriteByte(0x00); // st_info
@@ -73,12 +59,45 @@ void Compiler::Compile()
     symtab->WriteWord(0x01); // st_shndx
     symtab->WriteQuad(0x00); // st_value
     symtab->WriteQuad(0x00); // st_size
-
+    
+    // Write the file name to the string table
     strtab->WriteByte(0x00);
     for(char c : _inputFileName)
         strtab->WriteByte(c);
 
     strtab->WriteByte(0x00);
+    int strtab_ndx = _inputFileName.size() - 2;
+
+    for(Parsing::Node* node : parser.Parse())
+    {
+        if(Parsing::Label* label = dynamic_cast<Parsing::Label*>(node))
+        {
+            for(char c : label->GetName())
+            {
+                strtab->WriteByte(c);
+                ++strtab_ndx;
+            }
+            strtab->WriteByte(0x00);
+
+            symtab->WriteLong(strtab_ndx); // st_name
+            symtab->WriteByte(0x10); // st_info
+            symtab->WriteByte(0x00); // st_other
+            symtab->WriteWord(0x01); // st_shndx
+            symtab->WriteQuad(0x00); // st_value
+            symtab->WriteQuad(0x00); // st_size
+        }
+        else
+            node->Emit(text);
+        delete node;
+    }
+    
+    // Initialize the section header string table
+    for(Codegen::SectionHeader* shHdr : sections)
+    {
+        for(char c : shHdr->GetName())
+            shstrtab->WriteByte(c);
+        shstrtab->WriteByte(0x00);
+    }
 
     elf->WriteELFHeader();
     std::ofstream out(_inputFileName + ".o");

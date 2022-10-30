@@ -19,8 +19,9 @@ namespace Parsing
     }
     Lexing::Token Parser::Consume()
     {
+        Lexing::Token result = _current;
         _current = _lexer->NextToken();
-        return _current;
+        return result;
     }
 
     void Parser::ExpectToken(Lexing::TokenType type)
@@ -96,7 +97,7 @@ namespace Parsing
         ExpectToken(Lexing::TokenType::Colon);
         Consume();
 
-        return new Label(std::move(text));
+        return new Label(text);
     }
 
 

@@ -1,12 +1,12 @@
 #include <codegen/elf.hh>
-#include <fstream>
-#include <iostream>
 
 namespace Codegen
 {
     SectionHeader::SectionHeader(std::string name, ShType sh_type, unsigned long long sh_flags, unsigned int sh_name)
-        :_name(std::move(name)), _sh_type(sh_type), _sh_flags(sh_flags), _sh_name(sh_name), _sh_size(0)
+        :_name(std::move(name)), _sh_type(sh_type), _sh_flags(sh_flags), _sh_name(sh_name), _sh_size(0), _sh_info(0)
     {
+        if(_sh_type == ShType::SHT_SYMTAB)
+            _sh_info = 3;
     }
 
     void SectionHeader::WriteByte(unsigned char data, std::stringstream* stream)
@@ -51,6 +51,10 @@ namespace Codegen
     {
         _sh_offset = sh_offset;
     }
+    void SectionHeader::IncInfo()
+    {
+        ++_sh_info;
+    }
 
     void SectionHeader::Print(std::ostream& stream)
     {
@@ -59,7 +63,6 @@ namespace Codegen
         {
             stream << _data.rdbuf();
             size = ((size + 15) & ~15) - size; // Calculate bytes needed for padding
-            std::cout << size << std::endl;
             while(size--)
             {
                 int zero = 0x00;
@@ -80,15 +83,10 @@ namespace Codegen
             WriteQuad(_sh_offset, &_hdr);
         WriteQuad(_sh_size, &_hdr);
         if(_sh_type == ShType::SHT_SYMTAB)
-        {
             WriteLong(0x04, &_hdr); // sh_link
-            WriteLong(0x03, &_hdr); // sh_info
-        }
         else
-        {
             WriteLong(0x00, &_hdr); // sh_link
-            WriteLong(0x00, &_hdr); // sh_info
-        }
+        WriteLong(_sh_info, &_hdr);
         switch(_sh_type) // sh_addralign
         {
             case ShType::SHT_NULL:

@@ -3,7 +3,7 @@
 namespace Parsing
 {
     Label::Label(std::string name)
-        :Node(NodeType::Label), _name(std::move(name))
+        :Node(NodeType::Label), _name(name)
     {
     }
 
@@ -12,7 +12,12 @@ namespace Parsing
         stream << "<Label>: " << _name;
     }
 
-    void Label::Emit(Codegen::SectionHeader* text)
+    std::string Label::GetName() const
+    {
+        return _name;
+    }
+
+    void Label::Emit(Codegen::SectionHeader*)
     {
     }
 }

@@ -35,6 +35,7 @@ namespace Codegen
         std::string_view GetName() const;
         
         void SetOffset(unsigned long long sh_offset);
+        void IncInfo();
 
         void PrintHdr(std::ostream& stream);
         void Print(std::ostream& stream);
@@ -47,6 +48,7 @@ namespace Codegen
         unsigned long long _sh_offset;
         unsigned int _sh_name;
         unsigned long long _sh_size;
+        unsigned long _sh_info;
     };
 
     class ELF
