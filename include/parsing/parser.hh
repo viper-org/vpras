@@ -2,6 +2,8 @@
 #define VIPER_PARSING_PARSER_HH
 #include <parsing/node.hh>
 #include <parsing/instruction/mov.hh>
+#include <parsing/instruction/push.hh>
+#include <parsing/instruction/pop.hh>
 #include <parsing/instruction/ret.hh>
 #include <parsing/constant/label.hh>
 #include <parsing/constant/register.hh>
@@ -31,6 +33,8 @@ namespace Parsing
         Node* ParseTopLevel();
 
         Node* ParseMov();
+        Node* ParsePush();
+        Node* ParsePop();
         Node* ParseRet();
 
         Node* ParseLabel();

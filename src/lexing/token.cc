@@ -27,6 +27,10 @@ namespace Lexing
                 return "Integer";
             case TokenType::Movq:
                 return "Movq";
+            case TokenType::Pushq:
+                return "Pushq";
+            case TokenType::Popq:
+                return "Popq";
             case TokenType::Ret:
                 return "Ret";
             case TokenType::Eof:

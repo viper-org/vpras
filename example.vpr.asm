@@ -1,3 +1,3 @@
 global main:
-    movq %rdi, 12
+    movq %rax, %rdi
     ret

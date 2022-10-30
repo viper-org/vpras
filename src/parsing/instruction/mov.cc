@@ -24,10 +24,19 @@ namespace Parsing
 
     void MovInst::Emit(Codegen::SectionHeader* text)
     {
-        if(Register* reg = dynamic_cast<Register*>(_lhs))
+        if(Register* left = dynamic_cast<Register*>(_lhs))
         {
-            text->WriteByte(0xB8 + reg->GetID());
-            _rhs->Emit(text);
+            if(Register* right = dynamic_cast<Register*>(_rhs))
+            {
+                text->WriteByte(0x48);
+                text->WriteByte(0x89);
+                text->WriteByte(0xC0 + left->GetID() + right->GetID() * 8);
+            }
+            else
+            {
+                text->WriteByte(0xB8 + left->GetID());
+                _rhs->Emit(text);
+            }
         }
     }
 }

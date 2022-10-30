@@ -34,6 +34,8 @@ namespace Lexing
             { "section", TokenType::Section },
             { "global",  TokenType::Global },
             { "movq",    TokenType::Movq },
+            { "pushq",   TokenType::Pushq },
+            { "popq",    TokenType::Popq },
             { "ret",     TokenType::Ret },
         };
 

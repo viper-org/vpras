@@ -48,6 +48,10 @@ namespace Parsing
         {
             case Lexing::TokenType::Movq:
                 return ParseMov();
+            case Lexing::TokenType::Pushq:
+                return ParsePush();
+            case Lexing::TokenType::Popq:
+                return ParsePop();
             case Lexing::TokenType::Ret:
                 return ParseRet();
             case Lexing::TokenType::Global:
@@ -78,6 +82,41 @@ namespace Parsing
         Node* param2 = ParseParam();
 
         return new MovInst(std::move(param1), std::move(param2), size);
+    }
+
+    Node* Parser::ParsePush()
+    {
+        Size size;
+        switch(Consume().GetType())
+        {
+            case Lexing::TokenType::Pushq:
+                size = Size::QUAD;
+                break;
+
+            default:
+                return nullptr; // To make the compiler happy
+        }
+
+        Node* operand = ParseParam();
+
+        return new PushInst(std::move(operand), size);
+    }
+    Node* Parser::ParsePop()
+    {
+        Size size;
+        switch(Consume().GetType())
+        {
+            case Lexing::TokenType::Popq:
+                size = Size::QUAD;
+                break;
+
+            default:
+                return nullptr; // To make the compiler happy
+        }
+
+        Node* operand = ParseParam();
+
+        return new PopInst(std::move(operand), size);
     }
 
     Node* Parser::ParseRet()
