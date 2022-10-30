@@ -23,5 +23,7 @@ namespace Parsing
 
     void MovInst::Emit(Codegen::SectionHeader* text)
     {
+        text->WriteByte(0xB8);
+        _rhs->Emit(text);
     }
 }

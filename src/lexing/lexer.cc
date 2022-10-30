@@ -35,7 +35,6 @@ namespace Lexing
             { "global",  TokenType::Global },
             { "movq",    TokenType::Movq },
             { "ret",     TokenType::Ret },
-            { "rax",     TokenType::Register }, // TODO: Add actual register support
         };
 
         if(std::isalpha(Current()) || Current() == '_' || Current() == '.')
@@ -77,6 +76,16 @@ namespace Lexing
             case '\t':
                 Consume();
                 return NextToken();
+
+            case '%':
+            {
+                Consume();
+                std::string value;
+                while(std::isalpha(Current()))
+                    value += Consume();
+                
+                return Token(TokenType::Register, value, _lineNumber);
+            }
             
             case ':':
                 TOKEN(Colon);

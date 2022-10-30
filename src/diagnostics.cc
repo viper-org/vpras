@@ -26,7 +26,7 @@ namespace Diagnostics
 
     void CompilerError(const unsigned int lineNumber, std::string_view message)
     {
-        std::cerr << bold << fileName << ":" << lineNumber << ": " << defaults << message;
+        std::cerr << bold << fileName << ":" << lineNumber << ": " << defaults << message << std::endl;
         
         std::exit(1);
     }

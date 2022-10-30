@@ -73,6 +73,7 @@ namespace Parsing
         Node* param1 = ParseParam();
 
         ExpectToken(Lexing::TokenType::Comma);
+        Consume();
 
         Node* param2 = ParseParam();
 
@@ -107,14 +108,22 @@ namespace Parsing
         {
             case Lexing::TokenType::Register:
                 return ParseRegister();
-            
+            case Lexing::TokenType::Integer:
+                return ParseImmediate();
             default:
-                Diagnostics::CompilerError(Current().GetLine(), "Expected instruction parameter, found " + Current().GetText());
+                Diagnostics::CompilerError(Current().GetLine(), "Expected instruction parameter, found " + Current().TypeAsString());
         }
     }
 
     Node* Parser::ParseRegister()
     {
         return new Register(Consume().GetText(), Size::QUAD);
+    }
+
+    Node* Parser::ParseImmediate()
+    {
+        std::string text = Consume().GetText();
+
+        return new Immediate(std::stoi(text));
     }
 }

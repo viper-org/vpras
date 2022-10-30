@@ -5,6 +5,7 @@
 #include <parsing/instruction/ret.hh>
 #include <parsing/constant/label.hh>
 #include <parsing/constant/register.hh>
+#include <parsing/constant/immediate.hh>
 #include <lexing/lexer.hh>
 #include <vector>
 
@@ -37,6 +38,7 @@ namespace Parsing
         Node* ParseParam();
         
         Node* ParseRegister();
+        Node* ParseImmediate();
     };
 }
 
