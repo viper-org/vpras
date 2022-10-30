@@ -1,3 +1,4 @@
+#include <iostream>
 #include <parsing/parser.hh>
 #include <diagnostics.hh>
 
@@ -44,86 +45,24 @@ namespace Parsing
 
     Node* Parser::ParseTopLevel()
     {
+        std::cout << Current() << std::endl;
         switch(Current().GetType())
         {
             case Lexing::TokenType::Movq:
-                return ParseMov();
+                return ParseBinOp<MovInst, Size::QUAD>();
             case Lexing::TokenType::Pushq:
-                return ParsePush();
+                return ParseUnOp<PushInst, Size::QUAD>();
             case Lexing::TokenType::Popq:
-                return ParsePop();
+                return ParseUnOp<PopInst, Size::QUAD>();
+            case Lexing::TokenType::Subq:
+                return ParseBinOp<SubInst, Size::QUAD>();
             case Lexing::TokenType::Ret:
-                return ParseRet();
+                return ParseZeroOps<RetInst>();
             case Lexing::TokenType::Global:
                 return ParseLabel();
             default:
                 Diagnostics::CompilerError(Current().GetLine(), "Expected top-level directive/instruction, found " + Current().TypeAsString());
         }
-    }
-
-    Node* Parser::ParseMov()
-    {
-        Size size;
-        switch(Consume().GetType())
-        {
-            case Lexing::TokenType::Movq:
-                size = Size::QUAD;
-                break;
-
-            default:
-                return nullptr; // To make the compiler happy
-        }
-
-        Node* param1 = ParseParam();
-
-        ExpectToken(Lexing::TokenType::Comma);
-        Consume();
-
-        Node* param2 = ParseParam();
-
-        return new MovInst(std::move(param1), std::move(param2), size);
-    }
-
-    Node* Parser::ParsePush()
-    {
-        Size size;
-        switch(Consume().GetType())
-        {
-            case Lexing::TokenType::Pushq:
-                size = Size::QUAD;
-                break;
-
-            default:
-                return nullptr; // To make the compiler happy
-        }
-
-        Node* operand = ParseParam();
-
-        return new PushInst(std::move(operand), size);
-    }
-    Node* Parser::ParsePop()
-    {
-        Size size;
-        switch(Consume().GetType())
-        {
-            case Lexing::TokenType::Popq:
-                size = Size::QUAD;
-                break;
-
-            default:
-                return nullptr; // To make the compiler happy
-        }
-
-        Node* operand = ParseParam();
-
-        return new PopInst(std::move(operand), size);
-    }
-
-    Node* Parser::ParseRet()
-    {
-        Consume();
-
-        return new RetInst();
     }
 
 

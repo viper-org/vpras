@@ -31,6 +31,8 @@ namespace Lexing
                 return "Pushq";
             case TokenType::Popq:
                 return "Popq";
+            case TokenType::Subq:
+                return "Subq";
             case TokenType::Ret:
                 return "Ret";
             case TokenType::Eof:

@@ -4,6 +4,7 @@
 #include <parsing/instruction/mov.hh>
 #include <parsing/instruction/push.hh>
 #include <parsing/instruction/pop.hh>
+#include <parsing/instruction/sub.hh>
 #include <parsing/instruction/ret.hh>
 #include <parsing/constant/label.hh>
 #include <parsing/constant/register.hh>
@@ -32,10 +33,35 @@ namespace Parsing
 
         Node* ParseTopLevel();
 
-        Node* ParseMov();
-        Node* ParsePush();
-        Node* ParsePop();
-        Node* ParseRet();
+        template<typename T, Size size>
+        Node* ParseBinOp()
+        {
+            Consume();
+
+            Node* param1 = ParseParam();
+
+            ExpectToken(Lexing::TokenType::Comma);
+            Consume();
+
+            Node* param2 = ParseParam();
+
+            return new T(std::move(param1), std::move(param2), size);
+        }
+        template<typename T, Size size>
+        Node* ParseUnOp()
+        {
+            Consume();
+
+            Node* operand = ParseParam();
+
+            return new T(std::move(operand), size);
+        }
+        template<typename T>
+        Node* ParseZeroOps()
+        {
+            Consume();
+            return new T();
+        }
 
         Node* ParseLabel();
 

@@ -23,6 +23,7 @@ namespace Lexing
         Movq,
         Pushq,
         Popq,
+        Subq,
         
         Ret,
 

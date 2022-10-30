@@ -30,12 +30,13 @@ namespace Lexing
 
     Token Lexer::NextToken()
     {
-        std::unordered_map<std::string_view, TokenType> keywords = {
+        const static std::unordered_map<std::string_view, TokenType> keywords = {
             { "section", TokenType::Section },
             { "global",  TokenType::Global },
             { "movq",    TokenType::Movq },
             { "pushq",   TokenType::Pushq },
             { "popq",    TokenType::Popq },
+            { "subq",    TokenType::Subq },
             { "ret",     TokenType::Ret },
         };
 
